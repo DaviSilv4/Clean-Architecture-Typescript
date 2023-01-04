@@ -9,6 +9,7 @@
 
 > ## Exceção - Erro ao apagar dados do Cache
 1. Sistema retornar erro
+1. Sistema não grava os dados do Cache
 
 > ## Exceção - Erro ao gravar dados do Cache
 1. Sistema retornar erro
