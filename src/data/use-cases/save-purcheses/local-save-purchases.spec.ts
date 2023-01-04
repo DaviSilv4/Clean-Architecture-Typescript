@@ -1,10 +1,24 @@
 import { CacheStore } from '@/data/protocols/cache'
 import { LocalSavePurchases } from '@/data/use-cases'
+import { SavePurchases } from '@/domain'
 
 type SutTypes = {
     sut: LocalSavePurchases,
     cacheStore: CacheStoreSpy
 }
+
+const mockPurchases = (): SavePurchases.Params[] => [
+    {
+        id: '1',
+        date: new Date(),
+        value: 1
+    },
+    {
+        id: '5',
+        date: new Date(),
+        value: 64
+    }
+]
 
 const makeSut = (): SutTypes => {
     const cacheStore = new CacheStoreSpy();        
@@ -21,15 +35,17 @@ class CacheStoreSpy implements CacheStore{
     insertCallsCount = 0;
     deleteKey: string;
     insertKey: string;
+    insertValue: SavePurchases.Params[] = [];
 
     public delete(): void {
         this.deleteCallsCount++;
         this.deleteKey;
     }
 
-    public insert(key: string): void {
+    public insert(key: string, value: any): void {
         this.insertCallsCount++;
         this.insertKey;
+        this.insertValue = value;
     }
 }
 
@@ -41,7 +57,7 @@ describe('LocalSavePurchases', () => {
 
     test('Should delete old cache on sut.save', async () => {
         const { cacheStore, sut } = makeSut();    
-        await sut.save();
+        await sut.save(mockPurchases());
         expect(cacheStore.deleteCallsCount).toBe(1);
         expect(cacheStore.deleteKey).toBe('purchases');
     })
@@ -51,16 +67,18 @@ describe('LocalSavePurchases', () => {
         jest.spyOn(cacheStore, 'delete').mockImplementationOnce(() => {
             throw new Error();
         })
-        const promisse = sut.save();
+        const promisse = sut.save(mockPurchases());
         expect(cacheStore.insertCallsCount).toBe(0);
         expect(promisse).rejects.toThrow();
     })
 
     test('Should insert new Cache if delete succeeds', async () => {
         const { cacheStore, sut } = makeSut();    
-        await sut.save();
+        const purchases = mockPurchases();
+        await sut.save(purchases);
         expect(cacheStore.deleteCallsCount).toBe(1);
         expect(cacheStore.insertCallsCount).toBe(1);    
         expect(cacheStore.insertKey).toBe('purchases');
+        expect(cacheStore.insertValue).toEqual(purchases);
     })  
 })
