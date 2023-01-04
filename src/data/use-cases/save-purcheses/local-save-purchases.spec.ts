@@ -1,14 +1,7 @@
-class LocalSavePurchases{
-    constructor(public cacheStore: CacheStore){}
+import { CacheStore } from '@/data/protocols/cache'
+import { LocalSavePurchases } from '@/data/use-cases'
 
-    async save(): Promise<any>{
-        this.cacheStore.delete('purchases');
-    }
-}
 
-interface CacheStore{
-    delete: (key: string) => void;
-}
 
 type SutTypes = {
     sut: LocalSavePurchases,
@@ -49,9 +42,5 @@ describe('LocalSavePurchases', () => {
 
     })
 
-    test('Shoul call delete with correct key', async () => {
-        const { cacheStore, sut } = makeSut();    
-        await sut.save();
-    })
   
 })
