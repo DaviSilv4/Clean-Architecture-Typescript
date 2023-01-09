@@ -7,7 +7,7 @@ export class CacheStoreSpy implements CacheStore{
     insertKey: string;
     insertValue: SavePurchases.Params[] = [];
 
-    public delete(): void {
+    public delete(key: string): void {
         this.action.push(CacheStoreSpy.Action.delete)
         this.deleteKey;
     }
@@ -16,6 +16,11 @@ export class CacheStoreSpy implements CacheStore{
         this.action.push(CacheStoreSpy.Action.insert)
         this.insertKey;
         this.insertValue = value;
+    }
+
+    public replace(key: string, value: any): void {
+       this.delete(key)
+       this.insert(key, value)
     }
 
     public simulateDeleteError(): void {
